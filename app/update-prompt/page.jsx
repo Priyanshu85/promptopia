@@ -1,16 +1,14 @@
-"use client"
+"use client";
 import { Suspense } from 'react';
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import Form from '@components/Form';
 
 const UpdatePrompt = () => {
     const router = useRouter();
     const { data: session } = useSession();
-    const searchParams = useSearchParams()
-    const promptId = searchParams.get('id');
     const [submitting, setSubmitting] = useState(false);
     const [post, setPost] = useState({
         prompt: '',
@@ -18,6 +16,9 @@ const UpdatePrompt = () => {
     });
 
     useEffect(() => {
+        const searchParams = new URLSearchParams(window.location.search);
+        const promptId = searchParams.get('id');
+
         const getPromptDetails = async () => {
             const response = await fetch(`/api/prompt/${promptId}`);
             const data = await response.json();
@@ -25,16 +26,20 @@ const UpdatePrompt = () => {
             setPost({
                 prompt: data.prompt,
                 tag: data.tag,
-            })
-        }
+            });
+        };
 
         if (promptId) getPromptDetails();
-    }, [promptId])
+    }, []);
 
     const updatePrompt = async (e) => {
         e.preventDefault();
         setSubmitting(true);
+        const searchParams = new URLSearchParams(window.location.search);
+        const promptId = searchParams.get('id');
+
         if (!promptId) return alert('Prompt ID not found');
+
         try {
             const response = await fetch(`/api/prompt/${promptId}`, {
                 method: 'PATCH',
@@ -43,16 +48,16 @@ const UpdatePrompt = () => {
                     tag: post.tag,
                 }),
             });
+
             if (response.ok) {
                 router.push('/');
             }
         } catch (error) {
             console.log(error);
-        }
-        finally {
+        } finally {
             setSubmitting(false);
         }
-    }
+    };
 
     return (
         <Suspense fallback={<div>Loading...</div>}>
@@ -64,7 +69,7 @@ const UpdatePrompt = () => {
                 handleSubmit={updatePrompt}
             />
         </Suspense>
-    )
-}
+    );
+};
 
 export default UpdatePrompt;
