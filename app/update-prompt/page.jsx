@@ -2,14 +2,14 @@
 import { Suspense } from 'react';
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter} from 'next/navigation';
 
 import Form from '@components/Form';
 
 const UpdatePrompt = () => {
     const router = useRouter();
     const { data: session } = useSession();
-    const searchParams = useSearchParams();
+    // const searchParams = useSearchParams()
     const promptId = searchParams.get('id');
     const [submitting, setSubmitting] = useState(false);
     const [post, setPost] = useState({
